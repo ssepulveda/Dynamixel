@@ -3,17 +3,9 @@ __author__ = 'ssepulveda'
 from struct import *
 import binascii
 import serial
+from time import sleep
 
-
-HEADER = 0xFFFF
-DEVICE_ALL = 0xFE
-PING = 0x01
-READ_DATA = 0x02
-WRITE_DATA = 0x03
-REG_WRITE = 0x04
-ACTION = 0x05
-RESET = 0x06
-SYNC_WRITE = 0x83
+from dynamixel.controlTable import *
 
 
 def read(port):
@@ -22,18 +14,14 @@ def read(port):
         data = unpack(length * 'B', port.read(length))
 
         if error_type(device_id, data[0]):
-            # print(data[0])
             return False
         else:
             if read_crc(data[-1], (device_id + length + sum(data[0:-1]))):
-                debug_package([header, data], True)
-                return data[0:-1]
+                return data[1:-1]
 
         port.flushInput()
     except:
-        if port.read(1) == 0:
-            port.flushInput()
-            return True
+        print(port.read(100))
 
 
 def error_type(device_id, value):
@@ -71,42 +59,42 @@ def checksum(value):
 
 def reg_write(device_id, param, value):
     length = 4
-    instruction = REG_WRITE
+    instruction = instruct.REG_WRITE
     crc = checksum(device_id + length + instruction + param + value)
-    return pack('HBBBBBB', HEADER, device_id, length, instruction, param, value, crc)
+    return pack('HBBBBBB', instruct.HEADER, device_id, length, instruction, param, value, crc)
 
 
 def action(device_id):
     length = 2
-    instruction = ACTION
+    instruction = instruct.ACTION
     crc = checksum(device_id + length + instruction)
-    return pack('HBBBB', HEADER, device_id, length, instruction, crc)
+    return pack('HBBBB', instruct.HEADER, device_id, length, instruction, crc)
 
 
 def ping(device_id):
     length = 0
-    instruction = PING
+    instruction = instruct.PING
     crc = checksum(device_id + length + instruction)
-    return pack('HBBBB', HEADER, device_id, length, instruction, crc)
+    return pack('HBBBB', instruct.HEADER, device_id, length, instruction, crc)
 
 
 def read_data(device_id, address, size):
     length = 4
-    instruction = READ_DATA
+    instruction = instruct.READ_DATA
     crc = checksum(device_id + length + instruction + address + size)
-    return pack('HBBBBBB', HEADER, device_id, length, instruction, address, size, crc)
+    return pack('HBBBBBB', instruct.HEADER, device_id, length, instruction, address, size, crc)
 
 
 def write_data(device_id, param, value):
     length = 4
-    instruction = WRITE_DATA
+    instruction = 3
     crc = checksum(device_id + length + instruction + param + value)
-    return pack('HBBBBBB', HEADER, device_id, length, instruction, param, value, crc)
+    return pack('HBBBBBB', 0xFFFF, device_id, length, instruction, param, value, crc)
 
 
 def write_data_batch(device_id, address, values):
     length = 3 + len(values)
-    instruction = WRITE_DATA
+    instruction = instruct.WRITE_DATA
     crc = checksum(device_id + length + instruction + address + sum(values))
     data = [device_id, length, instruction, address] + values
     return "".join(map(chr, [0xFF, 0xFF] + data + [crc]))
@@ -125,28 +113,73 @@ def debug_package(package, is_input=False):
 
 def enable_led(port, device_id, enabled):
     port.flushOutput()
-    port.write(set_boolean(device_id, 25, enabled))
-    read(port)
+    port.write(set_boolean(device_id, reg.LED.address, enabled))
+    return read(port)
 
 
 def enable_torque(port, device_id, enabled):
     port.flushOutput()
-    port.write(set_boolean(device_id, 24, enabled))
-    read(port)
+    port.write(set_boolean(device_id, reg.TORQUE_ENABLE.address, enabled))
+    return read(port)
 
 
 def set_boolean(device_id, address, enabled):
     if enabled:
-        package = write_data_batch(device_id, address, [1])
+        package = write_data(device_id, address, 1)
     else:
-        package = write_data_batch(device_id, address, [0])
+        package = write_data(device_id, address, 0)
     return package
+
+
+def dec2hex_LH(value):
+    print unpack('BB', value)
 
 
 if __name__ == "__main__":
     s = serial.Serial('/dev/ttyUSB0', 1000000, timeout=0.1)
 
-    enable_led(s, DEVICE_ALL, False)
-    enable_torque(s, DEVICE_ALL, False)
+    instruct = Instruction()
+    reg = ControlTable()
+
+    s.write(read_data(1, 0, 49))
+    print(read(s))
+
+    s.write(read_data(2, 0, 49))
+    print(read(s))
+
+    device = instruct.BROADCAST
+    enable_led(s, device, True)
+    enable_torque(s, device, True)
+
+    device = 6
+
+
+    s.write(write_data_batch(device, 0x1E, [0x00, 0x03, 0x00, 0x02]))
+    print(read(s))
+    s.write(write_data_batch(2, 0x1E, [0xFF, 0x00, 0x00, 0x02]))
+    print(read(s))
+
+    sleep(1)
+
+    s.write(write_data_batch(device, 0x1E, [0x20, 0x03, 0x00, 0x02]))
+    print(read(s))
+
+    sleep(1)
+
+    s.write(write_data_batch(device, 0x1E, [0x00, 0x03, 0x00, 0x02]))
+    print(read(s))
+
+    sleep(1)
+
+    s.write(write_data_batch(device, 0x1E, [0x00, 0x02, 0x00, 0x02]))
+    print(read(s))
+    s.write(write_data_batch(2, 0x1E, [0x00, 0x02, 0x00, 0x02]))
+    print(read(s))
+
+    device = instruct.BROADCAST
+    enable_led(s, device, False)
+    enable_torque(s, device, False)
+
+    device = 2
 
     s.close()

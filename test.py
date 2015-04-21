@@ -133,7 +133,7 @@ def set_boolean(device_id, address, enabled):
 
 def dec2hex_lh(value):
     lh = "{0:0{1}X}".format(value, 4)
-    return int(lh[2:4], 16), int(lh[0:2], 16)
+    return [int(lh[2:4], 16), int(lh[0:2], 16)]
 
 
 def goal_position(device_id, value):
@@ -146,11 +146,17 @@ def moving_speed(device_id, value):
     s.write(write_data_batch(device_id, reg.MOVING_SPEED_L.address, [l, h]))
 
 
-def goto(serial, device_id, goal, speed=1023):
+def goto(port, device_id, goal, speed=1023):
     [goal_l, goal_h] = dec2hex_lh(goal)
     [speed_l, speed_h] = dec2hex_lh(speed)
-    serial.write(write_data_batch(device_id, reg.GOAL_POSITION_L.address, [goal_l, goal_h, speed_l, speed_h]))
-    check = read(serial)
+    port.write(write_data_batch(device_id, reg.GOAL_POSITION_L.address, [goal_l, goal_h, speed_l, speed_h]))
+    check = read(port)
+    print(check)
+
+
+def current_position(port, device_id):
+    port.write(read_data(device_id, reg.PRESENT_POSITION_L.address, 2))
+    check = read(port)
     print(check)
 
 
@@ -160,8 +166,48 @@ if __name__ == "__main__":
     instruct = Instruction()
     reg = ControlTable()
 
-    goto(s, 1, 0)
-    goto(s, 2, 0)
-    print(read(s))
+
+    pelvis_izq = 9
+    pelvis_der = 10
+    muslo_izq = 11
+    muslo_der = 12
+    rodilla_izq = 13
+    rodilla_der = 14
+    pie_f_izq = 15
+    pie_f_der = 16
+    pie_l_izq = 17
+    pie_l_der = 18
+
+    # initial position
+    for device in xrange(8, 19):
+        goto(s, device, 512, 100)
+        enable_torque(s, device, True)
+    # print(read(s))
+
+    sleep(2)
+    c = 512
+
+    goto(s, muslo_der, c+100, 50)
+    goto(s, rodilla_der, c+100, 50)
+
+
+
+    for it in range(0, 10):
+        goto(s, muslo_der, c, 50)
+        goto(s, rodilla_der, c, 50)
+        goto(s, muslo_izq, c-100, 50)
+        goto(s, rodilla_izq, c-100, 50)
+        sleep(2)
+
+        goto(s, muslo_der, c+100, 50)
+        goto(s, rodilla_der, c+100, 50)
+        goto(s, muslo_izq, c, 50)
+        goto(s, rodilla_izq, c, 50)
+        sleep(2)
+
+    # initial position
+    for device in xrange(8, 19):
+        goto(s, device, 512, 100)
+        enable_torque(s, device, True)
 
     s.close()

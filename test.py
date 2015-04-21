@@ -195,7 +195,7 @@ if __name__ == "__main__":
     pie_l_der = 18
 
     c = 512
-    sp = 100
+    sp = 50
     p = 100
     t = 1
 

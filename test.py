@@ -131,8 +131,27 @@ def set_boolean(device_id, address, enabled):
     return package
 
 
-def dec2hex_LH(value):
-    print unpack('BB', value)
+def dec2hex_lh(value):
+    lh = "{0:0{1}X}".format(value, 4)
+    return int(lh[2:4], 16), int(lh[0:2], 16)
+
+
+def goal_position(device_id, value):
+    [l, h] = dec2hex_lh(value)
+    s.write(write_data_batch(device_id, reg.GOAL_POSITION_L.address, [l, h]))
+
+
+def moving_speed(device_id, value):
+    [l, h] = dec2hex_lh(value)
+    s.write(write_data_batch(device_id, reg.MOVING_SPEED_L.address, [l, h]))
+
+
+def goto(serial, device_id, goal, speed=1023):
+    [goal_l, goal_h] = dec2hex_lh(goal)
+    [speed_l, speed_h] = dec2hex_lh(speed)
+    serial.write(write_data_batch(device_id, reg.GOAL_POSITION_L.address, [goal_l, goal_h, speed_l, speed_h]))
+    check = read(serial)
+    print(check)
 
 
 if __name__ == "__main__":
@@ -141,45 +160,8 @@ if __name__ == "__main__":
     instruct = Instruction()
     reg = ControlTable()
 
-    s.write(read_data(1, 0, 49))
+    goto(s, 1, 0)
+    goto(s, 2, 0)
     print(read(s))
-
-    s.write(read_data(2, 0, 49))
-    print(read(s))
-
-    device = instruct.BROADCAST
-    enable_led(s, device, True)
-    enable_torque(s, device, True)
-
-    device = 6
-
-
-    s.write(write_data_batch(device, 0x1E, [0x00, 0x03, 0x00, 0x02]))
-    print(read(s))
-    s.write(write_data_batch(2, 0x1E, [0xFF, 0x00, 0x00, 0x02]))
-    print(read(s))
-
-    sleep(1)
-
-    s.write(write_data_batch(device, 0x1E, [0x20, 0x03, 0x00, 0x02]))
-    print(read(s))
-
-    sleep(1)
-
-    s.write(write_data_batch(device, 0x1E, [0x00, 0x03, 0x00, 0x02]))
-    print(read(s))
-
-    sleep(1)
-
-    s.write(write_data_batch(device, 0x1E, [0x00, 0x02, 0x00, 0x02]))
-    print(read(s))
-    s.write(write_data_batch(2, 0x1E, [0x00, 0x02, 0x00, 0x02]))
-    print(read(s))
-
-    device = instruct.BROADCAST
-    enable_led(s, device, False)
-    enable_torque(s, device, False)
-
-    device = 2
 
     s.close()

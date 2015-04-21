@@ -160,13 +160,29 @@ def current_position(port, device_id):
     print(check)
 
 
+def initial_position(port, speed):
+    # initial position
+    for device_id in xrange(1, 18):
+        goto(port, device_id, 512, speed)
+        enable_torque(port, device_id, True)
+    # arms down
+    goto(port, hombro_l_izq, 512+250, speed)
+    goto(port, hombro_l_der, 512-250, speed)
+    sleep(2)
+
+
 if __name__ == "__main__":
     s = serial.Serial('/dev/ttyUSB0', 1000000, timeout=0.1)
 
     instruct = Instruction()
     reg = ControlTable()
 
-
+    hombro_g_der = 1
+    hombro_g_izq = 2
+    hombro_l_der = 3
+    hombro_l_izq = 4
+    codo_der = 5
+    codo_izq = 6
     pelvis_izq = 9
     pelvis_der = 10
     muslo_izq = 11
@@ -178,36 +194,35 @@ if __name__ == "__main__":
     pie_l_izq = 17
     pie_l_der = 18
 
-    # initial position
-    for device in xrange(8, 19):
-        goto(s, device, 512, 100)
-        enable_torque(s, device, True)
-    # print(read(s))
-
-    sleep(2)
     c = 512
+    sp = 100
+    p = 100
+    t = 1
 
-    goto(s, muslo_der, c+100, 50)
-    goto(s, rodilla_der, c+100, 50)
+    initial_position(s, 200)
 
+    goto(s, muslo_der, c+p, sp)
+    goto(s, rodilla_der, c+p, sp)
 
+    for it in range(0, 5):
+        goto(s, hombro_g_izq, c-100, sp)
+        goto(s, muslo_der, c, sp)
+        goto(s, rodilla_der, c, sp)
+        goto(s, muslo_izq, c-p, sp)
+        goto(s, rodilla_izq, c-p, sp)
+        # goto(s, pelvis_der, c+50, sp)
+        sleep(t)
+        goto(s, hombro_g_izq, c+100, sp)
 
-    for it in range(0, 10):
-        goto(s, muslo_der, c, 50)
-        goto(s, rodilla_der, c, 50)
-        goto(s, muslo_izq, c-100, 50)
-        goto(s, rodilla_izq, c-100, 50)
-        sleep(2)
+        goto(s, hombro_g_der, c+100, sp)
+        goto(s, muslo_der, c+p, sp)
+        goto(s, rodilla_der, c+p, sp)
+        goto(s, muslo_izq, c, sp)
+        goto(s, rodilla_izq, c, sp)
+        # goto(s, pelvis_izq, c-50, sp)
+        sleep(t)
+        goto(s, hombro_g_der, c-100, sp)
 
-        goto(s, muslo_der, c+100, 50)
-        goto(s, rodilla_der, c+100, 50)
-        goto(s, muslo_izq, c, 50)
-        goto(s, rodilla_izq, c, 50)
-        sleep(2)
-
-    # initial position
-    for device in xrange(8, 19):
-        goto(s, device, 512, 100)
-        enable_torque(s, device, True)
+    initial_position(s, 200)
 
     s.close()

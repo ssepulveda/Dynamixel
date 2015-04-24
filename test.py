@@ -164,10 +164,9 @@ def initial_position(port, speed):
     # initial position
     for device_id in xrange(1, 18):
         goto(port, device_id, 512, speed)
-        enable_torque(port, device_id, True)
     # arms down
-    goto(port, hombro_l_izq, 512+250, speed)
-    goto(port, hombro_l_der, 512-250, speed)
+    goto(port, hombro_l_izq, 512+200, speed)
+    goto(port, hombro_l_der, 512-200, speed)
     sleep(2)
 
 
@@ -195,12 +194,28 @@ if __name__ == "__main__":
     pie_l_der = 18
 
     c = 512
-    sp = 50
+    sp = 200
     p = 100
-    t = 1
+    t = .5
 
     initial_position(s, 200)
 
+    for i in xrange(0, 9):
+        goto(s, hombro_l_izq, c+100, sp)
+        goto(s, hombro_l_der, c+100, sp)
+        sleep(t)
+        goto(s, codo_izq, c-100, sp)
+        goto(s, codo_der, c+100, sp)
+        sleep(t)
+
+        goto(s, hombro_l_izq, c-100, sp)
+        goto(s, hombro_l_der, c-100, sp)
+        sleep(t)
+        goto(s, codo_izq, c+100, sp)
+        goto(s, codo_der, c-100, sp)
+        sleep(t)
+
+    """
     goto(s, muslo_der, c+p, sp)
     goto(s, rodilla_der, c+p, sp)
 
@@ -222,6 +237,7 @@ if __name__ == "__main__":
         # goto(s, pelvis_izq, c-50, sp)
         sleep(t)
         goto(s, hombro_g_der, c-100, sp)
+        """
 
     initial_position(s, 200)
 

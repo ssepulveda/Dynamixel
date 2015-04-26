@@ -21,6 +21,9 @@ if __name__ == "__main__":
     p = 100
     t = .5
 
+    action.reset_all(mark1.all)
+    sleep(2)
+
     # dance
     for i in xrange(0, 9):
         action.move(mark1.shoulder_vertical.left, c+100, s)
@@ -38,7 +41,5 @@ if __name__ == "__main__":
         action.move(mark1.elbow.left, c+100, s)
         action.move(mark1.elbow.right, c-100, s)
         sleep(t)
-
-    action.reset_all(mark1.all)
 
     port.close_port()

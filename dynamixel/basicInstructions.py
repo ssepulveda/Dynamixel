@@ -21,38 +21,74 @@ class BasicInstructions:
     def get_id(self, device):
         return self.read_register(device, self.reg.ID)
 
+    def set_id(self, device, value):
+        return self.write_register(device, self.reg.ID, value)
+
     def get_baudrate(self, device):
         return self.read_register(device, self.reg.BAUD_RATE)
+
+    def set_baudrate(self, device, value):
+        return self.write_register(device, self.reg.BAUD_RATE, value)
 
     def get_return_delay(self, device):
         return self.read_register(device, self.reg.RETURN_DELAY)
 
+    def set_return_delay(self, device, value):
+        return self.write_register(device, self.reg.RETURN_DELAY, value)
+
     def get_cw_angle_limit(self, device):
         return self.read_register(device, self.reg.CW_ANGLE_LIMIT_L)
+
+    def set_cw_angle_limit(self, device, value):
+        return self.write_register(device, self.reg.CW_ANGLE_LIMIT_L, value)
 
     def get_ccw_angle_limit(self, device):
         return self.read_register(device, self.reg.CCW_ANGLE_LIMIT_L)
 
+    def set_ccw_angle_limit(self, device, value):
+        return self.write_register(device, self.reg.CCW_ANGLE_LIMIT_L, value)
+
     def get_highest_limit_temperature(self, device):
         return self.read_register(device, self.reg.HIGHEST_LIMIT_TEMPERATURE)
+
+    def set_highest_limit_temperature(self, device, value):
+        return self.write_register(device, self.reg.HIGHEST_LIMIT_TEMPERATURE, value)
 
     def get_lowest_limit_voltage(self, device):
         return self.read_register(device, self.reg.LOWEST_LIMIT_VOLTAGE)
 
+    def set_lowest_limit_voltage(self, device, value):
+        return self.write_register(device, self.reg.LOWEST_LIMIT_VOLTAGE, value)
+
     def get_highest_limit_voltage(self, device):
         return self.read_register(device, self.reg.HIGHEST_LIMIT_VOLTAGE)
+
+    def set_highest_limit_voltage(self, device, value):
+        return self.write_register(device, self.reg.HIGHEST_LIMIT_VOLTAGE, value)
 
     def get_max_torque(self, device):
         return self.read_register(device, self.reg.MAX_TORQUE_L)
 
+    def set_max_torque(self, device, value):
+        return self.write_register(device, self.reg.MAX_TORQUE_L, value)
+
     def get_status_return_level(self, device):
         return self.read_register(device, self.reg.STATUS_RETURN_LEVEL)
+
+    def set_status_return_level(self, device, value):
+        return self.write_register(device, self.reg.STATUS_RETURN_LEVEL, value)
 
     def get_alarm_led(self, device):
         return self.read_register(device, self.reg.ALARM_LED)
 
+    def set_alarm_led(self, device, value):
+        return self.write_register(device, self.reg.ALARM_LED, value)
+
     def get_alarm_shutdown(self, device):
         return self.read_register(device, self.reg.ALARM_SHUTDOWN)
+
+    def set_alarm_shutdown(self, device, value):
+        return self.write_register(device, self.reg.ALARM_SHUTDOWN, value)
 
     def get_down_calibration(self, device):
         return self.read_register(device, self.reg.DOWN_CALIBRATION_L)
@@ -66,44 +102,55 @@ class BasicInstructions:
         return self.read_register(device, self.reg.TORQUE_ENABLE)
 
     def set_torque(self, device, enabled):
-        self.port.write(self.set_boolean(device, self.reg.TORQUE_ENABLE.address, enabled))
-        return self.port.read()
+        return self.set_boolean(device, self.reg.TORQUE_ENABLE.address, enabled)
 
     def get_led(self, device):
         return self.read_register(device, self.reg.LED)
 
     def set_led(self, device, enabled):
-        self.port.write(self.set_boolean(device, self.reg.LED.address, enabled))
-        return self.port.read()
+        return self.set_boolean(device, self.reg.LED.address, enabled)
 
     def get_cw_compliance_margin(self, device):
         return self.read_register(device, self.reg.CW_COMPLIANCE_MARGIN)
 
+    def set_cw_compliance_margin(self, device, value):
+        return self.write_register(device, self.reg.CW_COMPLIANCE_MARGIN, value)
+
     def get_ccw_compliance_margin(self, device):
         return self.read_register(device, self.reg.CCW_COMPLIANCE_MARGIN)
+
+    def set_ccw_compliance_margin(self, device, value):
+        return self.write_register(device, self.reg.CCW_COMPLIANCE_MARGIN, value)
 
     def get_cw_compliance_slope(self, device):
         return self.read_register(device, self.reg.CW_COMPLIANCE_SLOPE)
 
+    def set_cw_compliance_slope(self, device, value):
+        return self.write_register(device, self.reg.CW_COMPLIANCE_SLOPE, value)
+
     def get_ccw_compliance_slope(self, device):
         return self.read_register(device, self.reg.CCW_COMPLIANCE_SLOPE)
+
+    def set_ccw_compliance_slope(self, device, value):
+        return self.write_register(device, self.reg.CCW_COMPLIANCE_SLOPE, value)
 
     def get_goal_position(self, device):
         return self.read_register(device, self.reg.GOAL_POSITION_L)
 
     def set_goal_position(self, device, value):
-        [l, h] = self.dec2hex_lh(value)
-        self.port.write(self.instructions.write_data_batch(device, self.reg.GOAL_POSITION_L.address, [l, h]))
+        return self.write_register(device, self.reg.GOAL_POSITION_L, value)
 
     def get_speed(self, device):
         return self.read_register(device, self.reg.MOVING_SPEED_L)
 
     def set_speed(self, device, value):
-        [l, h] = self.dec2hex_lh(value)
-        self.port.write(self.instructions.write_data_batch(device, self.reg.MOVING_SPEED_L.address, [l, h]))
+        return self.write_register(device, self.reg.MOVING_SPEED_L, value)
 
     def get_torque_limit(self, device):
         return self.read_register(device, self.reg.TORQUE_LIMIT_L)
+
+    def set_torque_limit(self, device, value):
+        return self.write_register(device, self.reg.TORQUE_LIMIT_L, value)
 
     def get_present_position(self, device):
         return self.read_register(device, self.reg.PRESENT_POSITION_L)
@@ -123,14 +170,23 @@ class BasicInstructions:
     def get_registered_instruction(self, device):
         return self.read_register(device, self.reg.REGISTERED_INSTRUCTION)
 
+    def set_registered_instruction(self, device, value):
+        return self.write_register(device, self.reg.REGISTERED_INSTRUCTION, value)
+
     def get_moving(self, device):
         return self.read_register(device, self.reg.MOVING)
 
     def get_lock(self, device):
         return self.read_register(device, self.reg.LOCK)
 
+    def set_lock(self, device, value):
+        return self.write_register(device, self.reg.LOCK, value)
+
     def get_punch(self, device):
         return self.read_register(device, self.reg.PUNCH_L)
+
+    def set_punch(self, device, value):
+        return self.write_register(device, self.reg.PUNCH_L, value)
 
     # helpers
 
@@ -143,11 +199,25 @@ class BasicInstructions:
         self.port.write(self.instructions.read_data(device, register.address, register.size))
         return self.port.read()
 
-    def set_boolean(self, device, address, enabled):
-        if enabled:
-            package = self.instructions.write_data(device, address, 1)
+    def write_register(self, device, register, value):
+        if register.mode == 'rw':
+            if register.size == 2:
+                [l, h] = self.dec2hex_lh(value)
+                self.port.write(self.instructions.write_data_batch(device, register.address, [l, h]))
+                return self.port.read()
+            elif register.size == 1:
+                self.port.write(self.instructions.write_data(device, register.address, value))
+                return self.port.read()
+            else:
+                return False
         else:
-            package = self.instructions.write_data(device, address, 0)
+            return False
+
+    def set_boolean(self, device, register, enabled):
+        if enabled:
+            package = self.write_register(device, register, 1)
+        else:
+            package = self.write_register(device, register, 0)
         return package
 
     @staticmethod

@@ -200,6 +200,12 @@ if __name__ == "__main__":
 
     initial_position(s, 200)
 
+    # dx generation
+    """
+    sleep(2)
+    """
+
+    # dance
     for i in xrange(0, 9):
         goto(s, hombro_l_izq, c+100, sp)
         goto(s, hombro_l_der, c+100, sp)
@@ -215,6 +221,7 @@ if __name__ == "__main__":
         goto(s, codo_der, c-100, sp)
         sleep(t)
 
+    # walk
     """
     goto(s, muslo_der, c+p, sp)
     goto(s, rodilla_der, c+p, sp)

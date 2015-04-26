@@ -58,7 +58,6 @@ class ControlTable:
         self.PUNCH_H = Register(49, mode='rw')
 
 
-
 class Instruction:
     def __init__(self):
         self.HEADER = 0xFFFF
@@ -70,3 +69,31 @@ class Instruction:
         self.ACTION = 0x05
         self.RESET = 0x06
         self.SYNC_WRITE = 0x83
+
+
+class Validate:
+    def __init__(self):
+        self.INSTRUCTION = 64
+        self.OVERLOAD = 32
+        self.CHECKSUM = 16
+        self.OVERHEATING = 8
+        self.ANGLE_LIMIT = 4
+        self.INPUT_VOLTAGE = 2
+        self.NO_ERROR = 0
+
+    def is_error(self, error):
+        if error == self.NO_ERROR:
+            return False
+        else:
+            return [True, error]
+
+    def check(self, crc_in, data):
+        crc = self.checksum(data)
+        if crc == crc_in:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def checksum(value):
+        return (~value) & 0xFF

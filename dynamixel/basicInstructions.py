@@ -36,6 +36,14 @@ class BasicInstructions:
         self.port.write(self.instructions.read_data(device, self.reg.MOVING_SPEED_L.address, 2))
         return self.port.read()
 
+    def set_position_speed(self, device, position, speed):
+        [position_l, position_h] = self.dec2hex_lh(position)
+        [speed_l, speed_h] = self.dec2hex_lh(speed)
+        self.port.write(self.instructions.write_data_batch(device, self.reg.GOAL_POSITION_L.address,
+                                                           [position_l, position_h, speed_l, speed_h]))
+        return self.port.read()
+
+
     def wait_for_device(self, device):
         self.port.write(self.instructions.read_data(device, self.reg.MOVING.address, 1))
         print(self.port.read())

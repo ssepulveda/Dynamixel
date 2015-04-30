@@ -9,7 +9,7 @@ class AdvancedInstructions:
         self.actions = BasicInstructions(port)
         self.center = 512
 
-    def move(self, device, position, speed=1023):
+    def move(self, device, position, speed=100):
         response = self.actions.set_position_speed(device, position, speed)
         return response
 

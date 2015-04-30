@@ -2,6 +2,7 @@ __author__ = 'ssepulveda'
 
 from struct import unpack
 from controlTable import Validate
+import binascii
 import serial
 
 
@@ -21,17 +22,16 @@ class SerialCom():
         self.port.bytesize = serial.EIGHTBITS
 
         if self.port.isOpen():
-            return [False, "Port is open"]
+            return False
         else:
             try:
                 self.port.open()
-                self.port.flushOutput()
-                self.port.flushInput()
-                return [True, "Port open"]
+                # self.port.flushOutput()
+                # self.port.flushInput()
+                return True
             except:
                 raise
-            finally:
-                return [False, "Port error"]
+                return False
 
     def close_port(self):
         try:
@@ -43,7 +43,9 @@ class SerialCom():
 
     def read(self):
         try:
-            header, self.device, length = unpack('HBB', self.port.read(4))
+            package = self.port.read(4)
+            print("< " + binascii.hexlify(package))
+            header, self.device, length = unpack('HBB', package)
             data = unpack(length * 'B', self.port.read(length))
 
             if not self.validate.is_error(data[0]):
@@ -60,4 +62,5 @@ class SerialCom():
 
     def write(self, package):
         self.port.write(package)
+        print("> " + binascii.hexlify(package))
         self.port.flushOutput()

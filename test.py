@@ -37,15 +37,48 @@ if __name__ == "__main__":
     action.move(tobor.foot_vertical.right, c)
 
     # initial postion to walk
-    p = 300
-    action.move(tobor.thigh.left, c+200)
-    action.move(tobor.thigh.right, c-200)
-    action.move(tobor.knee.left, c+p)
-    action.move(tobor.knee.right, c-p)
+
+    thigh = 240
+    action.move(tobor.thigh.left, c+thigh)
+    action.move(tobor.thigh.right, c-thigh)
+    action.move(tobor.knee.left, c+300)
+    action.move(tobor.knee.right, c-300)
     action.move(tobor.foot_vertical.left, c-100)
     action.move(tobor.foot_vertical.right, c-100)
 
+    sleep(2)
 
+    t = 1
+    foot = 50  # angle of the foot
+    t2 = 100  # angle of the thight
+
+    """
+    @todo implement the waiting function to finish the goal movement
+    @todo implement a modification for using angles instead of numbers
+    """
+    for step in range(0, 4):
+        # first step
+        sleep(t)
+        action.move(tobor.foot_horizontal.right, c+foot, speed=100)
+        action.move(tobor.thigh.left, (c+thigh)+t2, speed=50)
+        action.move(tobor.foot_vertical.left, c, speed=50)
+
+        sleep(t)
+        action.move(tobor.foot_horizontal.right, c, speed=50)
+        action.move(tobor.thigh.left, (c+thigh), speed=100)
+        action.move(tobor.foot_vertical.left, c-t2, speed=200)
+
+        # second step
+        sleep(t)
+        action.move(tobor.foot_horizontal.left, c-foot, speed=100)
+        sleep(.2) # calibration problem ? takes longer to make the move... or implement wait function
+        action.move(tobor.thigh.right, (c-thigh)-t2, speed=50)
+        action.move(tobor.foot_vertical.right, c, speed=50)
+
+        sleep(t)
+        action.move(tobor.foot_horizontal.left, c, speed=50)
+        action.move(tobor.thigh.right, (c-thigh), speed=100)
+        action.move(tobor.foot_vertical.right, c-t2, speed=200)
 
     # dance
     """
